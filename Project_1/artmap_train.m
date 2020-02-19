@@ -38,12 +38,50 @@ function [C, w_code, w_out] = artmap_train(data_x, data_y, n_classes, verbose, s
   % Max number of commitable coding cells. C_max start uncommitted.
   C_max = 20;
   
+  %Initialize weights
   w_code = ones(2*M,C_max);
   w_out = zeroes(C_max,n_classes);
+  
+  %Set number of coded weights to 0
   C = 0;
+  
+  %Commit the first node
   addCommittedNode(C,data_x(:,1),data_y(:,1),w_code,w_out);
-  for i = 1:n_epochs
-      for j = 1:
+  
+  %For every epoch
+  for e = 1:n_epochs
+      %For every data point
+      for i = 2:size(data_x,2)
+          %Reset the vigilance
+          p = p_base;
+          %Compute net_in via choiceByDifference
+          net_in = choiceByDifference(data_x(:,i),w_code,C,alpha,M);
+          %Compute net_act by linear_thresholding of net_in
+          %Returns the indices of the valid w_j's, in order
+          [~,net_act] = net_in(possibleMatchInds(net_in,alpha,M))
+          %For every valid weight
+          for j = 1:size(net_act,2)
+              %If the potential match passes the vigilance test
+              if sum(min(w_code(:,net_act(:,j)),(data_x(:,i))),"all") > (M * p)
+                  %And is of the same class as the data point being considered
+                  if w_out(net_act(:,j),data_y(:,i)) == 1
+                      %Update the weight
+                      updateWts(beta,data_x(:,i),w_code,i);
+                      break;
+                  %But is of a different class
+                  else
+                      %Increase the vigilance
+                      matchTracking(data_x(:,i), w_code, i, M, e)
+                      %Continue search cycle
+                  end
+              end
+              %Exhausted all nodes without finding a match
+              if j == size(net_act,2)
+                  %Commit a new node
+                 addCommittedNode(C,data_x(:,i),data_y(:,i),w_code,w_out);
+              end
+          end
+      end
   end
       
 end

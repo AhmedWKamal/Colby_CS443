@@ -37,4 +37,9 @@ function [C, w_code, w_out] = artmap_train(data_x, data_y, n_classes, verbose, s
   n_epochs = 1;
   % Max number of commitable coding cells. C_max start uncommitted.
   C_max = 20;
+  
+  w_code = ones(2*M,C_max);
+  w_out = zeroes(C_max,n_classes);
+  C = 0;
+  addCommittedNode(C,data_x(:,1),data_y
 end

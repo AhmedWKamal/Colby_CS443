@@ -15,4 +15,5 @@ function p = matchTracking(curr_A, w_code, active_ind, M, e)
   % Returns:
   %%%%%%%%%%%%%%%%%%%%
   % p: double. Adjusted vigilance parameter.
+  p = ((1/M) * sum(min(w_code(:,active_ind),curr_A),"all")) + e;
 end

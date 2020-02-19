@@ -14,4 +14,7 @@ function w_code = updateWts(beta, curr_A, w_code, active_ind)
   % Returns:
   %%%%%%%%%%%%%%%%%%%%
   % w_code: matrix. size=(2*M, C_max). Input-to-coding-layer adaptive weights. Wt updated only for the cell at active_ind.
+  a = min(w_code(:,active_ind),curr_A) * beta;
+  b = (1 - beta) * w_code(:,active_ind);
+  w_code(:,active_ind) = a+b;
 end

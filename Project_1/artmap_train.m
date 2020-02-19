@@ -41,5 +41,9 @@ function [C, w_code, w_out] = artmap_train(data_x, data_y, n_classes, verbose, s
   w_code = ones(2*M,C_max);
   w_out = zeroes(C_max,n_classes);
   C = 0;
-  addCommittedNode(C,data_x(:,1),data_y
+  addCommittedNode(C,data_x(:,1),data_y(:,1),w_code,w_out);
+  for i = 1:n_epochs
+      for j = 1:
+  end
+      
 end

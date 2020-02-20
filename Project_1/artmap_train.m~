@@ -86,7 +86,7 @@ function [C, w_code, w_out] = artmap_train(data_x, data_y, n_classes, verbose, s
                  addCommittedNode(C,data_x(:,i),data_y(:,i),w_code,w_out);
               end
           end
-          plotCategoryBoxes(data_x, data_y, j, C, w_code, w_out, "train", y_pred);
+          plotCategoryBoxes(data_x, data_y, j, C, w_code, w_out, train_or_test, y_pred);
       end
   end
       

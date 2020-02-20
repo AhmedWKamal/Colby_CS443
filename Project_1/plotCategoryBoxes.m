@@ -50,5 +50,58 @@ function plotCategoryBoxes(A, data_y, n, C, w_code, w_out, train_or_test, y_pred
   % incorrect, make the marker an x.
   %
   % Tip: It is possible to write this function without any loops
+  hold on;
+  
+  % draw circle with following parameters
+  x = 0.5; y = 0.5; r = 1/sqrt(2*pi);
+  rectangle('Position', [x-r y-r 2*r 2*r], 'Curvature', [1 1]);
+  
+  % adjust aspect ratios
+  pbaspect([1 1 1]);
+  
+  % For each category, draw the box
+  for i = 1:C
+    if w_out(i, 0) == 1
+      col = 'blue';
+    else
+      col = 'red';
+    end
+    p = plot([w_code(1, i), 1-w_code(3, i), 1-w_code(3, i), w_code(1, i), w_code(1, i)],
+        [w_code(2, i), w_code(2, i), 1-w_code(4, i), 1-w_code(4, i), w_code(2, i)]);
+    p.Color(col);
+  end
+ 
+  % if training, draw all points upto the current point in their classes 
+  % respective color and plot the current one with a black +
+  if strcmpi(train_or_test, 'train')
+    plot(A(0, n), A(1, n), 'bl+')
+    for i = 1:n-1
+      if data_y(0, i) == 1
+        col = 'b';
+      else
+        col = 'r';
+      end
+      plot(A(0, i), A(1, i), col)
+    end
+   
+  % if testing, draw all points upto the current point in their respective
+  % classes color and code correct predictions with a circle, otherwise an x
+  else
+    for i = 1:n
+      if y_pred(0, i) == 1 & data_y(0, i) == 1
+        col = 'b.';
+      elseif y_pred(0, i) == 1 & data_y(0, i) == 0
+        col = 'b*';
+      elseif y_pred(1, i) == 1 & data_y(1, i) == 1
+        col = 'r.';
+      else
+        col = 'r*';
+      end
+      plot(A(0, i), A(1, i), col)
+    end
+  end
+  
+  hold off;
+
 end
 

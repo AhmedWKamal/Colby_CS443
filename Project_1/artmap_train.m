@@ -70,24 +70,24 @@ function [C, w_code, w_out] = artmap_train(data_x, data_y, n_classes, verbose, s
                   %And is of the same class as the data point being considered
                   if find(w_out(sorted_inds(j), :)) == data_y(i)
                       %Update the weight
-                      updateWts(beta,data_x(:,i),w_code,i);
+                      w_code = updateWts(beta, data_x(:,i), w_code, j);
                       
                       break;
                   %But is of a different class
                   else
                       %Increase the vigilance
-                      matchTracking(data_x(:,i), w_code, i, M, e)
+                      p = matchTracking(data_x(:,i), w_code, i, M, e);
                       %Continue search cycle
                   end
               end
               %Exhausted all nodes without finding a match
               if j == size(net_act,2)
                   %Commit a new node
-                 addCommittedNode(C,data_x(:,i),data_y(:,i),w_code,w_out);
-              end
-          end
-          plotCategoryBoxes(data_x, data_y, j, C, w_code, w_out, "train", y_pred);
-      end
+                 [C, w_code, w_out] = addCommittedNode(C,data_x(:,i),data_y(:,i),w_code,w_out);
+              end       
+          end % ART search cycle
+%           plotCategoryBoxes(data_x, data_y, j, C, w_code, w_out, "train");   %ypred
+      end % training sample 2->N loop
   end
       
 end

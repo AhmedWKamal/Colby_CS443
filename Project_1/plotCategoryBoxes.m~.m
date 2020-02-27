@@ -63,9 +63,9 @@ function plotCategoryBoxes(A, data_y, n, C, w_code, w_out, train_or_test, y_pred
   % For each category, draw the box
   for i = 1:C
     if w_out(i, 1) == 1
-      col = 'blue';
+      col = 'b';
     else
-      col = 'red';
+      col = 'r';
     end
     
     xVals = [w_code(1, i), 1-w_code(3, i), 1-w_code(3, i), w_code(1, i), w_code(1, i)];

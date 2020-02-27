@@ -37,7 +37,7 @@ function [C, w_code, w_out] = artmap_train(data_x, data_y, n_classes, verbose, s
   n_epochs = 1;
   % Max number of commitable coding cells. C_max start uncommitted.
   C_max = 20;
-  M = size(data_x,1)
+  M = size(data_x,1);
   
   %Initialize weights
   w_code = ones(2*M,C_max);
@@ -55,6 +55,8 @@ function [C, w_code, w_out] = artmap_train(data_x, data_y, n_classes, verbose, s
   for e = 1:n_epochs
       %For every data point
       for i = 2:size(data_x,2)
+
+          
           %Reset the vigilance
           p = p_base;
           %Compute net_in via choiceByDifference
@@ -76,7 +78,7 @@ function [C, w_code, w_out] = artmap_train(data_x, data_y, n_classes, verbose, s
                   %But is of a different class
                   else
                       %Increase the vigilance
-                      p = matchTracking(data_x(:,i), w_code, i, M, e);
+                      p = matchTracking(data_x(:,i), w_code, j, M, e);
                       %Continue search cycle
                   end
               end
@@ -87,6 +89,10 @@ function [C, w_code, w_out] = artmap_train(data_x, data_y, n_classes, verbose, s
               end       
           end % ART search cycle
 %           plotCategoryBoxes(data_x, data_y, j, C, w_code, w_out, "train");   %ypred
+           
+          if show_plot
+              plotCategoryBoxes(data_x, data_y, i, C, w_code, w_out, "train", 0);
+          end    
       end % training sample 2->N loop
   end
       

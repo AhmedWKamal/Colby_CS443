@@ -84,7 +84,7 @@ if strcmpi(train_or_test, 'train')
     if data_y(1, i) == 1
       col = 'bo';
     else
-      col = 'ro';
+      col = 'rs';
     end
     plot(A(1, i), A(2, i), col);
   end

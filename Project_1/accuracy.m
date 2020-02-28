@@ -10,4 +10,6 @@ function acc = accuracy(pred_y, true_y)
   % Returns:
   %%%%%%%%%%%%%%%%%%%%
   % acc: double. Accuracy on the dataset.
+  acc_mat = [pred_y == true_y];
+  acc = sum(acc_mat, "all")/size(true_y, 2);
 end

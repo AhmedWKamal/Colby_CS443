@@ -54,10 +54,7 @@ data_x = complementCode(data_x);
 %For every epoch
 for ep = 1:n_epochs
   %For every data point
-  for i = 2:size(data_x,2)
-    if show_plot
-      plotCategoryBoxes(data_x, data_y, i, C, w_code, w_out, "train");
-    end
+  for i = 2:size(data_x,2)-1
     %Reset the vigilance
     p = p_base;
     %Compute net_in via choiceByDifference
@@ -91,7 +88,9 @@ for ep = 1:n_epochs
         [C, w_code, w_out] = addCommittedNode(C,data_x(:,i),data_y(:,i),w_code,w_out);
       end
     end % ART search cycle
-    
+    if show_plot
+      plotCategoryBoxes(data_x, data_y, i, C, w_code, w_out, "train");
+    end
   end % training sample 2->N loop
 end
 

@@ -43,11 +43,15 @@ data_x = complementCode(data_x);
 %Commit the first node
 [C, w_code, w_out] = addCommittedNode(C,data_x(:,1),data_y(:,1),w_code,w_out);
 
+size(data_y)
+size(data_x)
+
 yh_pred = [];
 %For every epoch
 for e = 1:n_epochs
   %For every data point
   for i = 1:size(data_x, 2)
+    disp(i)
     %Reset the vigilance
     p = p_base;
     %Compute net_in via choiceByDifference

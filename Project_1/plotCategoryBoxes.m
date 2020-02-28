@@ -54,8 +54,6 @@ function plotCategoryBoxes(A, data_y, n, C, w_code, w_out, train_or_test, y_pred
 clf();
 hold on;
 
-
-
 % draw circle with following parameters
 x = 0.5; y = 0.5; r = 1/sqrt(2*pi);
 rectangle('Position', [x-r y-r 2*r 2*r], 'Curvature', [1 1]);
@@ -74,21 +72,8 @@ for i = 1:C
   xVals = [w_code(1, i), 1-w_code(3, i), 1-w_code(3, i), w_code(1, i), w_code(1, i)];
   yVals = [w_code(2, i), w_code(2, i), 1-w_code(4, i), 1-w_code(4, i), w_code(2, i)];
   
-  %     if all(xVals == xVals(1)) == 0 && all(yVals == yVals(1))
-  %       % plot only markers, depending on which class it is
-  %       plot(A(0, n), A(1, n), 'bl+')
-  %       for i = 1:n-1
-  %         if data_y(0, i) == 1
-  %           col = 'b';
-  %         else
-  %           col = 'r';
-  %         end
-  %         plot(A(0, i), A(1, i), col)
-  %       end
-  %     else
-  % plot elongated cat boxes
   p = plot(xVals, yVals, col);
-  %     p.Color(col);
+
 end
 
 % if training, draw all points upto the current point in their classes
@@ -101,23 +86,24 @@ if strcmpi(train_or_test, 'train')
     else
       col = 'ro';
     end
-    plot(A(1, i), A(2, i), col)
+    plot(A(1, i), A(2, i), col);
   end
   
   % if testing, draw all points upto the current point in their respective
   % classes color and code correct predictions with a circle, otherwise an x
 else
   for i = 1:n
-    if y_pred(1, i) == 1 && data_y(1, i) == 1
-      col = 'b.';
-    elseif y_pred(1, i) == 1 && data_y(1, i) == 0
+    
+    if y_pred(i, 1) == 1 && data_y(1, i) == 1
+      col = 'bo';
+    elseif y_pred(i, 1) == 1 && data_y(1, i) == 2
       col = 'b*';
-    elseif y_pred(2, i) == 1 && data_y(2, i) == 1
-      col = 'r.';
+    elseif y_pred(i, 2) == 1 && data_y(1, i) == 2
+      col = 'ro';
     else
       col = 'r*';
     end
-    plot(A(1, i), A(2, i), col)
+    plot(A(1, i), A(2, i), col);
   end
 end
 

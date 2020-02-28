@@ -50,11 +50,8 @@ function plotCategoryBoxes(A, data_y, n, C, w_code, w_out, train_or_test, y_pred
 % incorrect, make the marker an x.
 %
 % Tip: It is possible to write this function without any loops
-% figure(1);
-clf();
+figure(1);
 hold on;
-
-
 
 % draw circle with following parameters
 x = 0.5; y = 0.5; r = 1/sqrt(2*pi);
@@ -94,12 +91,12 @@ end
 % if training, draw all points upto the current point in their classes
 % respective color and plot the current one with a black +
 if strcmpi(train_or_test, 'train')
-  plot(A(1, n), A(1, n), 'k+')
+  plot(A(1, n), A(1, n), 'bl+')
   for i = 1:n-1
     if data_y(1, i) == 1
-      col = 'bo';
+      col = 'b';
     else
-      col = 'ro';
+      col = 'r';
     end
     plot(A(1, i), A(2, i), col)
   end
@@ -122,6 +119,6 @@ else
 end
 
 hold off;
-drawnow;
+
 end
 

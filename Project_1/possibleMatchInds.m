@@ -14,7 +14,7 @@ function [pm_inds, pm_sorted_inds] = possibleMatchInds(Tj, alpha, M)
   % pm_inds. matrix. size=(1, C*). int indices of above-thresold Tj values. C* is the number of above threshold Tj values.
   % pm_sorted_inds. matrix. size=(1, C*). int indices of max-to-min sorted above-thresold Tj values.
   pm_inds = find(Tj > alpha*M);
-  [B,pm_sorted_inds] = sort(Tj,"descend");
-  pm_sorted_inds = pm_sorted_inds(:,1:size(pm_inds,2));
+  [~, pm_sorted_inds] = sort(Tj, "descend");
+  pm_sorted_inds = pm_sorted_inds(:, 1:size(pm_inds, 2));
 end
 

@@ -43,7 +43,7 @@ data_x = complementCode(data_x);
 %Commit the first node
 [C, w_code, w_out] = addCommittedNode(C,data_x(:,1),data_y(:,1),w_code,w_out);
 
-yh_pred = [];
+yh_pred = zeros(n_classes, size(data_y, 2));
 %For every epoch
 for e = 1:n_epochs
   %For every data point
@@ -55,7 +55,7 @@ for e = 1:n_epochs
     %Compute net_act by linear_thresholding of net_in
     %Returns the indices of the valid w_j's, in order
     [~, sorted_inds] = sort(net_in, "descend"); %possibleMatchInds(net_in, alpha, M);
-    yh_pred = [yh_pred; w_out(sorted_inds(1), :)];
+    yh_pred(:, i) = w_out(sorted_inds(1), :);
     % The predicted class of the current test sample class is the index of the
     %coding-to-output weight vector coming from the most active coding cell that is nonzero.
     if show_plot

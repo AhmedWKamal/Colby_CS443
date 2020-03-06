@@ -46,7 +46,7 @@ for e = 1:n_epochs
     %Compute net_act by linear_thresholding of net_in
     %Returns the indices of the valid w_j's, in order
     [~, sorted_inds] = sort(net_in, "descend"); %possibleMatchInds(net_in, alpha, M);
-    c_pred(:, i) = w_code(sorted_inds(1), :);
+    c_pred(:, i) = w_out(sorted_inds(1), :);
     % The predicted class of the current test sample class is the index of the
     %coding-to-output weight vector coming from the most active coding cell that is nonzero.
     if show_plot

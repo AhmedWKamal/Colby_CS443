@@ -67,11 +67,8 @@ for ep = 1:n_epochs
   for i = 2:size(data_x,2)
     %Compute net_in via Weber Law
     Tj = choiceByWeber( data_x(:,i), w_code, alpha, C );
-    %Compute net_act by linear_thresholding of net_in
     %Returns the indices of the valid w_j's, in order
     [~, sorted_inds] = sort(Tj, "descend");
-    %     [~, sorted_inds] = possibleMatchInds(net_in,alpha,M);
-    %net_act = net_in(sorted_inds);
     
     %For every valid weight
     for j = 1:size(sorted_inds, 1) %sorted max to min
@@ -80,7 +77,7 @@ for ep = 1:n_epochs
         % If match is an uncommitted cell, commit it and break out
         if j > C %match uncommited
           [C, w_code] = addCommittedNode(C,data_x(:,1),w_code);
-          breakd;
+          break;
         else
           % Else match is with a committed cell, updates its wts break out
           %Update the weight

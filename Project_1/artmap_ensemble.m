@@ -45,7 +45,7 @@ function [final_preds, acc] = artmap_ensemble(train_x, train_y, test_x, test_y, 
   C_max = 20;
   
   show_plot = false;
-  predictions = zeros(size(test_x, 2), n_classes);
+  predictions = zeros(n_classes, size(test_x, 2));
   
   for i = 1:n_voters
     shuffle_idx = randperm(100);
@@ -54,9 +54,13 @@ function [final_preds, acc] = artmap_ensemble(train_x, train_y, test_x, test_y, 
   
     [C, w_code, w_out] = artmap_train(data_train_x, data_train_y, n_classes, verbose , show_plot);
     
-    yh_pred = artmap_test_wta(C, w_code, w_out, test_x, test_y, n_classes, verbose, show_plot);
+    yh_pred = artmap_test_wta(C, w_code, w_out, test_x, test_y, n_classes, verbose, show_plot);    
     predictions = predictions + yh_pred;
   end
-  [~, final_preds] = max(predictions, 2);
+  [~, final_preds] = max(predictions, [], 1);
+  %disp("Size of predictions")
+  %disp(size(predictions))
+  %disp("Size of final preds")
+  %disp(size(final_preds))
   acc = accuracy(final_preds, test_y);
 end

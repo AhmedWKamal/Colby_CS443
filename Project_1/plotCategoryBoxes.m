@@ -93,12 +93,13 @@ if strcmpi(train_or_test, 'train')
   % classes color and code correct predictions with a circle, otherwise an x
 else
   for i = 1:n
-    
-    if y_pred(i, 1) == 1 && data_y(1, i) == 1
+%     data_y
+%     y_pred
+    if y_pred(1, i) == 1 && data_y(1, i) == 1
       col = 'bo';
-    elseif y_pred(i, 1) == 1 && data_y(1, i) == 2
+    elseif y_pred(1, i) == 1 && data_y(1, i) == 2
       col = 'b*';
-    elseif y_pred(i, 2) == 1 && data_y(1, i) == 2
+    elseif y_pred(2, i) == 1 && data_y(1, i) == 2
       col = 'ro';
     else
       col = 'r*';

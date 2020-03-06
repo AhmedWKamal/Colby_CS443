@@ -62,5 +62,6 @@ function [final_preds, acc] = artmap_ensemble(train_x, train_y, test_x, test_y, 
   %disp(size(predictions))
   %disp("Size of final preds")
   %disp(size(final_preds))
+  [~, final_preds] = max(predictions, [], 2);
   acc = accuracy(final_preds, test_y);
 end

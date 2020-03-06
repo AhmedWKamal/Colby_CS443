@@ -27,7 +27,6 @@ function [mnist_data, mnist_y] = load_mnist(mnist_path, which_set, num_exemplars
   else
     mnist.test= dense_data_x = load('mnist_path' + "/train")
   end 
-  %load number of classes % digits once load works
   
   
 end

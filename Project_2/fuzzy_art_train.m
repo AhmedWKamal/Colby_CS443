@@ -66,14 +66,14 @@ for ep = 1:n_epochs
   %For every data point
   for i = 2:size(data_x,2)
     %Compute net_in via Weber Law
-    Tj = choiceByWeber( data_x(:,i), w_code, alpha, C );
+    Tj = choiceByWeber( data_x(:,i), w_code, alpha, C_max );
     %Returns the indices of the valid w_j's, in order
     [~, sorted_inds] = sort(Tj, "descend");
-    
     %For every valid weight
-    for j = 1:size(sorted_inds, 1) %sorted max to min
-      %If the potential match passes the vigilance test
-      if sum(min(w_code(:,sorted_inds(j)),(data_x(:,i))),"all") > p %vigilance test
+    for j = 1:size(sorted_inds, 2) %sorted max to min
+      %If the potential match passes the vigilance 
+      test_val = norm(min(w_code(:,sorted_inds(j)),data_x(:,i)),1)/norm(data_x(:,i),1);
+      if test_val >= p %vigilance test
         % If match is an uncommitted cell, commit it and break out
         if j > C %match uncommited
           [C, w_code] = addCommittedNode(C,data_x(:,1),w_code);

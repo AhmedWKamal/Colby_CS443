@@ -22,12 +22,43 @@ function [mnist_data, mnist_y] = load_mnist(mnist_path, which_set, num_exemplars
   %   Int-codes of MNIST class for each sample. Codes should be ints in the range (inclusive) [0, 9] and literally mean
   %   which digit is shown in the image.
   
-  if strcompi('which_set', 'train')
-    mnist.train= dense_data_x = load('mnist_path' + "/train")
+  if strcmp(which_set, 'train')
+    mnist_data = load(mnist_path + "mnist_train.mat");
+    mnist_data = mnist_data.data;
+    mnist_y = load(mnist_path + "mnist_train_labels.mat");
+    mnist_y = mnist_y.y;
   else
-    mnist.test= dense_data_x = load('mnist_path' + "/train")
-  end 
-  %load number of classes % digits once load works
+    mnist_data = load(mnist_path + "mnist_test.mat");
+    mnist_data = mnist_data.data;
+    mnist_y = load(mnist_path + "mnist_test_labels.mat");
+    mnist_y = mnist_y.y;
+  end
+  
+  
+  mnist_data_ret = [];
+  mnist_y_ret = [];
+  
+  %Create 
+  for i = 1:num_classes
+      logical_indices = (mnist_y(:) == i-1);
+      temp_x = mnist_data(logical_indices,:);
+      temp_y = mnist_y(logical_indices);
+      mnist_data_ret = [mnist_data_ret; temp_x(1:num_exemplars,:)];
+      mnist_y_ret = [mnist_y_ret;temp_y(1:num_exemplars)'];
+  end
+  
+  mnist_data = mnist_data_ret';
+  disp(size(mnist_data))
+  mnist_y = mnist_y_ret;
+  for i = 1:num_classes
+      for j = 1:min(10,num_exemplars)
+          disp(num2str((i-1)*num_exemplars+j)+"-"+num2str(i+num_classes*(j)))
+          subplot(num_exemplars,num_classes,(i-1)*num_exemplars+j)
+          img_mat = reshape(mnist_data(:,i+num_classes*(j)),28,28);
+          imshow(img_mat')
+      end
+  end
+  mnist_data = mnist_data/255;
   
   
 end

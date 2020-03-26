@@ -29,7 +29,10 @@ def resize_imgs(imgs, width, height):
     for i in range(len(imgs)):
         imgs[i]= imgs[i].resize((width, height))
         imgs[i] = ImageOps.grayscale(imgs[i])
-    return imgs
+        imgs[i] = np.array(imgs[i])
+    #imgs= np.uint8s(imgs)
+    #imgs = imgs.astype(np.uint8)
+    return np.array(imgs)
 
 
 def img2binaryvectors(data, bipolar=True):
@@ -53,15 +56,23 @@ def img2binaryvectors(data, bipolar=True):
     #normalize
     maxData= np.max(data)
     minData = np.min(data)
-    normData= (data - min)/max 
+    normData= (data - minData)/maxData 
+    normData= normData- np.mean(normData, axis = 0 )
     #center 
+
+    #do in loop 
+
     for i in range(len(normData)):
-        if i > 0:
-            data[i] = 1
+        if normData > 0:
+            curr_data = normData[i]
+            curr_data[curr_data > 0] = 1
+            normData[i] = curr_data
         else:
-            data[i] = -1
+            curr_data = normData[i]
+            curr_data[curr_data < 0] = -1
+            normData[i] = curr_data
     #reshape
-    imgvect = np.reshape(imgs.shape[0], np.prod(imgs.shape[1:]))
+    imgvect = np.reshape(normData,normData.shape[0], np.prod(normData.shape[1:]))
     return imgvect
 
 

@@ -36,10 +36,10 @@ class HopfieldNet():
         '''
         self.wts = self.initialize_wts(data)
         self.orig_height = orig_height
-        self .orig_width = orig_width
+        self.orig_width = orig_width
         self.energy_hist= []
-        self.num_neurons= data.size[0]
-        self.num_samps= ? 
+        self.num_neurons= np.shape(data,1)
+        self.num_samps= np.shape(data,0) 
 
     def initialize_wts(self, data):
         '''Weights are initialized by applying Hebb's Rule to all pairs of M components in each
@@ -61,7 +61,9 @@ class HopfieldNet():
         '''
         # for i in range(len(data)):
         #     wts = sum()
-        pass
+
+        self.wts = (np.sum(data.T * data))/(self.num_samps)
+        return self.wts 
 
     def energy(self, netAct):
         '''Computes the energy of the current network state / activation
@@ -77,7 +79,9 @@ class HopfieldNet():
         -----------
         float. The energy.
         '''
-        pass
+        netAct = netAct[np.newaxis, :]
+        en = (-.5)(np.sum(np.sum(netAct @ self.wts @ netAct.T)))
+        return en 
 
     def predict(self, data, update_frac=0.1, tol=1e-15, verbose=False, show_dynamics=False):
         '''Use each data sample in `data` to look up the associated memory stored in the network.
@@ -125,4 +129,27 @@ class HopfieldNet():
         '''
         if np.ndim(data) < 2:
             data = np.expand_dims(data, axis=0)
+
+        for i in np.shape(data, 0):
+            data(i,:) = net #set activity of network units
+             #select random fraction of neurons
+             inds = update_frac * M 
+             #update activity of this fraction 
+             y= np.sign(np.sum(y * self.wts + bias ))
+
+
+
+
         pass
+
+
+
+
+
+
+
+
+
+
+
+

@@ -63,16 +63,17 @@ def img2binaryvectors(data, bipolar=True):
     #do in loop 
 
     for i in range(len(normData)):
-        if normData > 0:
-            curr_data = normData[i]
-            curr_data[curr_data > 0] = 1
-            normData[i] = curr_data
-        else:
-            curr_data = normData[i]
-            curr_data[curr_data < 0] = -1
-            normData[i] = curr_data
+        curr_data = normData[i]
+        curr_data[curr_data >= 0] = 1
+        # normData[i] = curr_data
+        curr_data[curr_data < 0] = -1
+        normData[i] = curr_data
     #reshape
-    imgvect = np.reshape(normData,normData.shape[0], np.prod(normData.shape[1:]))
+    print("normData", normData.shape)
+    print("normData0 ", normData.shape[0])
+    print("normData1 ", normData.shape[1:])
+    imgvect = np.reshape(normData , (normData.shape[0], np.prod(normData.shape[1:])))
+
     return imgvect
 
 

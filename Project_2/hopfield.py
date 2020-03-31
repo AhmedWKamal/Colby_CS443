@@ -34,12 +34,12 @@ class HopfieldNet():
             Initially an empty Python list.
         - self.wts: handled by `initialize_wts`
         '''
-        self.num_samps= np.shape(data,0)
+        self.num_samps= data.shape[0]
         self.wts = self.initialize_wts(data)
         self.orig_height = orig_height
         self.orig_width = orig_width
         self.energy_hist= []
-        self.num_neurons= np.shape(data,1)
+        self.num_neurons= data.shape[1]
 
     def initialize_wts(self, data):
         '''Weights are initialized by applying Hebb's Rule to all pairs of M components in each
@@ -137,14 +137,16 @@ class HopfieldNet():
                 numCells = update_frac * self.num_samps #round indicies 
 
                 #get rand indices between 1 and numcells, without replacement 
-                inds = 0
+                inds = 
 
                 #update net activity of this fraction 
                 netAct[inds]= np.sign(np.sum(netAct * self.wts[:,inds])) #check dimensions
 
-                currEnergy = self.energy(netAct) #calculate energy
+                currEnergy = self.energy(netAct) #calculate energy 
 
-        #plot 
+                #where does prev energy get calculated? 
+
+        #plotting code, use code from notebook 
 
 
 

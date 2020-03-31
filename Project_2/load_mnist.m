@@ -23,43 +23,44 @@ function [mnist_data, mnist_y] = load_mnist(mnist_path, which_set, num_exemplars
   %   which digit is shown in the image.
   
   if strcmp(which_set, 'train')
-    mnist_data = load(mnist_path + "mnist_train.mat");
-    mnist_data = mnist_data.data;
-    mnist_y = load(mnist_path + "mnist_train_labels.mat");
-    mnist_y = mnist_y.y;
+    full_mnist_data = load(mnist_path + "mnist_train.mat");
+    full_mnist_data = full_mnist_data.data;
+    full_mnist_y = load(mnist_path + "mnist_train_labels.mat");
+    full_mnist_y = full_mnist_y.y;
   else
-    mnist_data = load(mnist_path + "mnist_test.mat");
-    mnist_data = mnist_data.data;
-    mnist_y = load(mnist_path + "mnist_test_labels.mat");
-    mnist_y = mnist_y.y;
+    full_mnist_data = load(mnist_path + "mnist_test.mat");
+    full_mnist_data = full_mnist_data.data;
+    full_mnist_y = load(mnist_path + "mnist_test_labels.mat");
+    full_mnist_y = full_mnist_y.y;
   end
   
   
-  mnist_data_ret = [];
-  mnist_y_ret = [];
+  [full_mnist_y, I] = sort(full_mnist_y);
+  full_mnist_data = full_mnist_data(I,:)';
   
-  %Create 
+  mnist_data = [];
+  mnist_y = [];
+  
   for i = 1:num_classes
-      logical_indices = (mnist_y(:) == i-1);
-      temp_x = mnist_data(logical_indices,:);
-      temp_y = mnist_y(logical_indices);
-      mnist_data_ret = [mnist_data_ret; temp_x(1:num_exemplars,:)];
-      mnist_y_ret = [mnist_y_ret;temp_y(1:num_exemplars)'];
+      x = full_mnist_data(:,1:num_exemplars);
+      mnist_data = [mnist_data,x];
+      mnist_y = [mnist_y;(i-1)*ones(num_exemplars,1)];
+      full_mnist_data = full_mnist_data(:,full_mnist_y ~= i-1);
+      full_mnist_y = full_mnist_y(full_mnist_y ~= i-1);
   end
   
-  mnist_data = mnist_data_ret';
-  disp(size(mnist_data))
-  mnist_y = mnist_y_ret;
-  for i = 1:num_classes
-      for j = 1:min(10,num_exemplars)
-          disp(num2str((i-1)*num_exemplars+j)+"-"+num2str(i+num_classes*(j)))
-          subplot(num_exemplars,num_classes,(i-1)*num_exemplars+j)
-          img_mat = reshape(mnist_data(:,i+num_classes*(j)),28,28);
-          imshow(img_mat')
+  
+   for i = 1:min(10,num_exemplars)  
+      for j = 1:num_classes      
+           n1 = sub2ind([min(10,num_exemplars),num_classes],i,j);
+           n2 = (i-1)*num_classes + j;         
+           subplot(min(10,num_exemplars),num_classes,n2);
+           img_mat = reshape(mnist_data(:,n1),28,28);
+           imshow(img_mat');
       end
-  end
-  mnist_data = mnist_data/255;
+   end
   
+   mnist_data = im2double(mnist_data);
   
 end
 

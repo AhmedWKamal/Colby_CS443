@@ -52,7 +52,6 @@ end
 M = size(data,1);
 %Initialize weights
 w_code = ones(2*M,C_max);
-
 %Set number of coded weights to 0
 C = 0;
 % complement code
@@ -65,7 +64,7 @@ data_x = complementCode(data);
 for ep = 1:n_epochs
   %For every data point
   for i = 2:size(data_x,2)
-    %Compute net_in via Weber Law
+    %Compute net_in via Weber Laws
     Tj = choiceByWeber( data_x(:,i), w_code, alpha, C_max );
     %Returns the indices of the valid w_j's, in order
     [~, sorted_inds] = sort(Tj, "descend");
@@ -75,13 +74,14 @@ for ep = 1:n_epochs
       test_val = norm(min(w_code(:,sorted_inds(j)),data_x(:,i)),1)/norm(data_x(:,i),1);
       if test_val >= p %vigilance test
         % If match is an uncommitted cell, commit it and break out
-        if j > C %match uncommited
-          [C, w_code] = addCommittedNode(C,data_x(:,1),w_code);
+        if sorted_inds(j) > C %match uncommited
+          C = C+1;
+          w_code = updateWts(beta, data_x(:,i), w_code, sorted_inds(j));
           break;
         else
           % Else match is with a committed cell, updates its wts break out
           %Update the weight
-          w_code = updateWts(beta, data_x(:,i), w_code, j);
+          w_code = updateWts(beta, data_x(:,i), w_code, sorted_inds(j));
           break; 
         end
         %Continue search cycle

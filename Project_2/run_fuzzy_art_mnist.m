@@ -41,9 +41,62 @@ function [mnist_test_y, code_inds, C] =  run_fuzzy_art_mnist(mnist_path, sets, .
   %
   % TODO: (also see notebook)
   % - Load MNIST train and test sets.
-  % - Fuzzy ART on training set.
+  % - Train Fuzzy ART on training set.
   % - Possibly visualize the weights.
   % - Predict the categories of the test set images.
   % - Possibly visualize the weights of the most active coding units during prediction to the test images.
+  
+  [mnist_train_data, ~] = load_mnist(mnist_path, sets{1,1}, num_exemplars(1,1), num_classes, false);
+  [mnist_test_data, mnist_test_y] = load_mnist(mnist_path, sets{2,1}, num_exemplars(2,1), num_classes, false);
+  
+  [C, w_code]= fuzzy_art_train(mnist_train_data, false, varargin{:});
+  
+  if noisify_test
+      f = 0.84;
+      num_corrupted_pixels = ceil(f*size(mnist_test_data,1));
+      indices_to_corrupt = randperm(size(mnist_test_data,1),num_corrupted_pixels);
+      for i = 1:size(mnist_test_data,2)
+          I = ceil(num_corrupted_pixels/2);
+          %Set half to 0
+          mnist_test_data(indices_to_corrupt(1:I),:) = 0;
+          %Set half to 1
+          mnist_test_data(indices_to_corrupt(I:end),:) = 1;
+      end
+  end
+  
+  if erase_test
+      f = 0.5;
+      cols_erased = 1:ceil(f*28);
+      for i = 1:size(mnist_test_data,2)
+          mat = reshape(mnist_test_data(:,i),28,28)';
+          mat(:,cols_erased) = 0;
+          mnist_test_data(:,i) = reshape(mat',784,1);
+      end
+  end
+  
+  code_inds = fuzzy_art_predict(C, w_code, mnist_test_data, false);
+  
+  if plot_wts
+      for i = 1:C
+          subplot(1,C,i);
+          img = uint8(w_code(1:784,i)*255);
+          img_mat = reshape(img,28,28);
+          imshow(img_mat');
+      end
+  end
+  
+  if plot_recall
+      for i = 1:size(mnist_test_data,2)
+          subplot(size(mnist_test_data,2),2,2*i-1);
+          img = mnist_test_data(:,i);
+          img_mat = reshape(img,28,28);
+          imshow(img_mat');
+          subplot(size(mnist_test_data,2),2,2*i);
+          img = uint8(w_code(1:784,code_inds(i))*255);
+          img_mat = reshape(img,28,28);
+          imshow(img_mat');
+      end
+  end
+
 end
 

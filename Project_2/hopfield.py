@@ -142,6 +142,7 @@ class HopfieldNet():
         for i in range(self.num_samps):
             print("looping through samples")
             netAct = data[i].copy() #copy of data object
+            netAct = netAct.flatten().T
 
             if len(self.energy_hist) < 2: # energy hist < 2
                 print("energy hist < 2")
@@ -187,7 +188,7 @@ class HopfieldNet():
                 ax = fig.add_subplot(1, 1, 1)
 
                 ax.plot(netAct)
-                ax.set_title("Energy" + self.energy_hist[-1])
+                ax.set_title("Energy")
                 
                 display(fig)
                 clear_output(wait=True)

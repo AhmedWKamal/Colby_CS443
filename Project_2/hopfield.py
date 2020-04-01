@@ -7,6 +7,7 @@ Project 2: Content Addressable Memory
 import numpy as np
 import matplotlib.pyplot as plt
 from IPython.display import display, clear_output
+import random 
 
 
 class HopfieldNet():
@@ -62,7 +63,9 @@ class HopfieldNet():
         # for i in range(len(data)):
         #     wts = sum()
 
-        self.wts = (np.sum(data.T @ data))/ ( self.num_samps)
+
+        #old wts (np.sum(data.T @ data)) / (self.num_samps)
+        self.wts = ((data.T @ data)) / (self.num_samps)
         return self.wts 
 
     def energy(self, netAct):
@@ -80,7 +83,9 @@ class HopfieldNet():
         float. The energy.
         '''
         netAct = netAct[np.newaxis, :]
-        en = (-.5)(np.sum(np.sum(netAct @ self.wts @ netAct.T)))
+        print("energy" , netAct.shape)
+        print('wts', self.wts.shape)
+        en = (-.5)(np.sum(np.sum(netAct.T @ self.wts @ netAct)))
         return en 
 
     def predict(self, data, update_frac=0.1, tol=1e-15, verbose=False, show_dynamics=False):
@@ -132,19 +137,31 @@ class HopfieldNet():
 
         for i in range(self.num_samps):
             netAct = data[i].copy() #copy of data object
-            while currEnergy - prevEnergy > tol: #check energy tolerance level
-                #select random fraction of neurons
-                numCells = update_frac * self.num_samps #round indicies 
+            if len(self.energy_hist) < 2:
+                                #select random fraction of neurons
+                numCells = int(round(update_frac * self.num_samps)) #round indicies 
 
                 #get rand indices between 1 and numcells, without replacement 
-                inds = 
+                inds = np.random.randint(0, numCells)
 
                 #update net activity of this fraction 
                 netAct[inds]= np.sign(np.sum(netAct * self.wts[:,inds])) #check dimensions
 
                 currEnergy = self.energy(netAct) #calculate energy 
+                self.energy_hist.append(currEnergy)
+            else: 
+                while self.energy_hist[-1] - self.energy_hist[-2] > tol: #check energy tolerance level
+                    #select random fraction of neurons
+                    numCells = int(round(update_frac * self.num_samps)) #round indicies 
 
-                #where does prev energy get calculated? 
+                    #get rand indices between 1 and numcells, without replacement 
+                    inds = np.random.randint(0, numCells)
+
+                    #update net activity of this fraction 
+                    netAct[inds]= np.sign(np.sum(netAct * self.wts[:,inds])) #check dimensions
+
+                    currEnergy = self.energy(netAct) #calculate energy 
+                    self.energy_hist.append(currEnergy)
 
         #plotting code, use code from notebook 
 

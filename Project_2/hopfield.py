@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from IPython.display import display, clear_output
 import random 
+import math 
 
 
 class HopfieldNet():
@@ -134,37 +135,69 @@ class HopfieldNet():
 
         NOTE: Your code should work even if num_test_samps=1.
         '''
+        print("running")
         if np.ndim(data) < 2:
             data = np.expand_dims(data, axis=0)
 
         for i in range(self.num_samps):
+            print("looping through samples")
             netAct = data[i].copy() #copy of data object
 
-            if len(self.energy_hist) < 2: #how do you deal with nergy comparisons when list is empty? 
-                continue
-
-            while self.energy_hist[-1] - self.energy_hist[-2] > tol: #check energy tolerance level
+            if len(self.energy_hist) < 2: # energy hist < 2
+                print("energy hist < 2")
                 #select random fraction of neurons
-                numCells = int(round(update_frac * self.num_samps)) #round indicies 
+                numCells = int(math.ceil(update_frac * self.num_samps)) #round indicies 
 
                 #get rand indices between 1 and numcells, without replacement 
+                print("num samps: ", self.num_samps)
+                print("numCells: ", numCells)
                 inds = np.random.randint(0, numCells)
 
-                #update net activity of this fraction 
-                netAct[inds]= np.sign(np.sum(netAct * self.wts[:,inds])) #check dimensions
+                #update net activity of this fraction
+
+                print("netAct: ", netAct.shape)
+                print("wts: ", self.wts.shape)
+                print("wts[:,inds]: ", self.wts[:,inds].shape)
+                netAct[inds]= np.sign(np.sum(netAct @ self.wts[:,inds])) #check dimensions #help
 
                 currEnergy = self.energy(netAct) #calculate energy 
                 self.energy_hist.append(currEnergy)
+
+            else: 
+                while self.energy_hist[-1] - self.energy_hist[-2] > tol: #check energy tolerance level
+                    print("checking energy levels")
+                    #select random fraction of neurons
+                    numCells = int(math.ceil(update_frac * self.num_samps)) #round indicies 
+
+                    #get rand indices between 1 and numcells, without replacement 
+                    inds = np.random.randint(0, numCells)
+
+                    #update net activity of this fraction 
+                    netAct[inds]= np.sign(np.sum(netAct * self.wts[:,inds])) #check dimensions
+
+                    currEnergy = self.energy(netAct) #calculate energy 
+                    self.energy_hist.append(currEnergy)
 
             if show_dynamics == true: #plotting code, use code from notebook 
 
                 fig = plt.figure()
                 ax = fig.add_subplot(1, 1, 1)
-                plt.plot(netAct)
-                plt.set_title("Energy" + self.energy_hist[-1])
+
+                ax.plot(netAct)
+                ax.set_title("Energy" + self.energy_hist[-1])
+                
                 display(fig)
                 clear_output(wait=True)
                 plt.pause(2)
+
+
+
+
+# img_filename = os.path.join('data', 'mountain_1x.png') 
+# img = plt.imread(img_filename)
+# print(f'Image size is {img.shape}')
+# plt.imshow(img)
+# plt.xticks([]) plt.yticks([]) plt.show()
 
 
 

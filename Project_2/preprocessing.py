@@ -114,7 +114,7 @@ def recall_error(orig_data, recovered_data, tol=0.5):
     -----------
     float. error rate, a proportion between 0 and 1, of how many vector components are mismatched.
     '''
-    errorCount = np.sum( orig_data != recovered_data)
+    errorCount = np.sum( orig_data != recovered_data) #check for false, sum 
     totalCount = orig_data.shape[0] * orig_data.shape[1]
     errorRate = errorCount / totalCount
 

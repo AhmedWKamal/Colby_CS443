@@ -66,7 +66,8 @@ class HopfieldNet():
 
         #old wts (np.sum(data.T @ data)) / (self.num_samps)
         self.wts = ((data.T @ data)) / (self.num_samps)
-        return self.wts 
+        np.fill_diagonal(self.wts, 0)
+        return self.wts
 
     def energy(self, netAct):
         '''Computes the energy of the current network state / activation
@@ -83,9 +84,9 @@ class HopfieldNet():
         float. The energy.
         '''
         netAct = netAct[np.newaxis, :]
-        print("energy" , netAct.shape)
-        print('wts', self.wts.shape)
-        en = (-.5)(np.sum(np.sum(netAct.T @ self.wts @ netAct)))
+        print(np.shape(netAct))
+        print(np.shape(self.wts))
+        en = (-.5)*(np.sum(np.sum(netAct.T @ self.wts @ netAct)))
         return en 
 
     def predict(self, data, update_frac=0.1, tol=1e-15, verbose=False, show_dynamics=False):

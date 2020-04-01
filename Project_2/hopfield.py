@@ -158,7 +158,9 @@ class HopfieldNet():
                 print("netAct: ", netAct.shape)
                 print("wts: ", self.wts.shape)
                 print("wts[:,inds]: ", self.wts[:,inds].shape)
-                netAct[inds]= np.sign(np.sum(netAct @ self.wts[:,inds])) #check dimensions #help
+                flatAct= netAct.flatten()
+                print("flat:", flatAct.shape)
+                netAct[inds]= np.sign(np.sum(flatAct @ self.wts[:,inds])) #check dimensions #help
 
                 currEnergy = self.energy(netAct) #calculate energy 
                 self.energy_hist.append(currEnergy)
@@ -173,12 +175,13 @@ class HopfieldNet():
                     inds = np.random.randint(0, numCells)
 
                     #update net activity of this fraction 
-                    netAct[inds]= np.sign(np.sum(netAct * self.wts[:,inds])) #check dimensions
+                    flatAct= netAct.flatten()
+                    netAct[inds]= np.sign(np.sum(flatAct @ self.wts[:,inds])) #check dimensions
 
                     currEnergy = self.energy(netAct) #calculate energy 
                     self.energy_hist.append(currEnergy)
 
-            if show_dynamics == true: #plotting code, use code from notebook 
+            if show_dynamics == True: #plotting code, use code from notebook 
 
                 fig = plt.figure()
                 ax = fig.add_subplot(1, 1, 1)

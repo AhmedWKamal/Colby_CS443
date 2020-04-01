@@ -84,9 +84,10 @@ class HopfieldNet():
         float. The energy.
         '''
         netAct = netAct[np.newaxis, :]
-        print(np.shape(netAct))
-        print(np.shape(self.wts))
-        en = (-.5)*(np.sum(np.sum(netAct.T @ self.wts @ netAct)))
+        # print(np.shape(netAct))
+        # print(np.shape(self.wts))
+        #en = (-.5)*(np.sum(np.sum(netAct.T @ self.wts @ netAct)))
+        en = (-.5)*(np.sum(np.sum(netAct @ self.wts @ netAct.T)))
         return en 
 
     def predict(self, data, update_frac=0.1, tol=1e-15, verbose=False, show_dynamics=False):
@@ -138,8 +139,12 @@ class HopfieldNet():
 
         for i in range(self.num_samps):
             netAct = data[i].copy() #copy of data object
-            if len(self.energy_hist) < 2:
-                                #select random fraction of neurons
+
+            if len(self.energy_hist) < 2: #how do you deal with nergy comparisons when list is empty? 
+                continue
+
+            while self.energy_hist[-1] - self.energy_hist[-2] > tol: #check energy tolerance level
+                #select random fraction of neurons
                 numCells = int(round(update_frac * self.num_samps)) #round indicies 
 
                 #get rand indices between 1 and numcells, without replacement 
@@ -150,21 +155,16 @@ class HopfieldNet():
 
                 currEnergy = self.energy(netAct) #calculate energy 
                 self.energy_hist.append(currEnergy)
-            else: 
-                while self.energy_hist[-1] - self.energy_hist[-2] > tol: #check energy tolerance level
-                    #select random fraction of neurons
-                    numCells = int(round(update_frac * self.num_samps)) #round indicies 
 
-                    #get rand indices between 1 and numcells, without replacement 
-                    inds = np.random.randint(0, numCells)
+            if show_dynamics == true: #plotting code, use code from notebook 
 
-                    #update net activity of this fraction 
-                    netAct[inds]= np.sign(np.sum(netAct * self.wts[:,inds])) #check dimensions
-
-                    currEnergy = self.energy(netAct) #calculate energy 
-                    self.energy_hist.append(currEnergy)
-
-        #plotting code, use code from notebook 
+                fig = plt.figure()
+                ax = fig.add_subplot(1, 1, 1)
+                plt.plot(netAct)
+                plt.set_title("Energy" + self.energy_hist[-1])
+                display(fig)
+                clear_output(wait=True)
+                plt.pause(2)
 
 
 

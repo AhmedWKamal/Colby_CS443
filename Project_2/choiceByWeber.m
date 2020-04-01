@@ -6,7 +6,6 @@ function Tj = choiceByWeber(curr_A, w_code, alpha, C_max)
 % curr_A: Current input
 % w_code: Coding layer wts for committed nodes only!
 % alpha: Choice parameter
-
 Tj = zeros(1,C_max);
 for i = 1:C_max
   a = norm(min(w_code(:,i),curr_A),1);

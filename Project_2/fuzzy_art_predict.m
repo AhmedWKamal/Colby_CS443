@@ -28,30 +28,18 @@ for arg = 1:2:length(varargin)
   end
 end
 
-M = size(data_x,1);
+M = size(data,1);
 
 % complement code
 data = complementCode(data);
 
-%Commit the first node
-[C, w_code] = addCommittedNode(C,data(:,1),w_code);
-
-c_pred = zeros(n_classes, size(data, 2));
-%For every epoch
-for e = 1:n_epochs
-  %For every data point
-  for i = 1:size(data, 2)
+c_pred = zeros(size(data,2), 1);
+%For every data point
+for i = 1:size(data, 2)
     %Compute net_in via choiceByDifference
-    net_in = choiceByWeber(data(:, i), w_code, C, alpha, M);
+    net_in = choiceByWeber(data(:, i), w_code, alpha, C);
     %Compute net_act by linear_thresholding of net_in
     %Returns the indices of the valid w_j's, in order
     [~, sorted_inds] = sort(net_in, "descend"); %possibleMatchInds(net_in, alpha, M);
-    c_pred(:, i) = w_code(sorted_inds(1), :);
-    % The predicted class of the current test sample class is the index of the
-    %coding-to-output weight vector coming from the most active coding cell that is nonzero.
-    if show_plot
-      plotCategoryBoxes(data, i, C, w_code, "test", c_pred);
-    end
-  end % training sample 2->N loop
-end
+    c_pred(i, 1) = sorted_inds(1);
 end

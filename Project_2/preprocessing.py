@@ -7,6 +7,7 @@ Project 2: Content Addressable Memory
 import numpy as np
 from PIL import Image
 from PIL import ImageOps
+import matplotlib.pyplot as plt
 
 
 def resize_imgs(imgs, width, height):
@@ -53,17 +54,25 @@ def img2binaryvectors(data, bipolar=True):
     - Center the image then threshold at 0 so that values are either -1 or +1.
     - Reshape so that the result is a 1D vector (see shape above)
     '''
-    #normalize
-    maxData= np.max(data)
-    minData = np.min(data)
-    normData= (data - minData)/maxData 
-    normData= normData- np.mean(normData, axis = 0 )
-    #center 
+    # #normalize
+    # maxData= np.max(data, axis=0 )
+    # minData = np.min(data, axis=0)
+    normData= data.copy()
+    # normData= (data - minData)/maxData 
+    # normData= normData- np.mean(normData, axis = 0 )
+    # #center 
+    # plt.imshow(normData[0].reshape(64,64))
 
     #do in loop 
 
-    for i in range(len(normData)):
+    for i in range(len(data)):
         curr_data = normData[i]
+        maxData= np.max(curr_data)
+        minData = np.min(curr_data)
+        curr_data = (curr_data - minData)/(maxData - minData)
+
+        curr_data= curr_data- np.mean(curr_data )
+
         curr_data[curr_data >= 0] = 1
         # normData[i] = curr_data
         curr_data[curr_data < 0] = -1

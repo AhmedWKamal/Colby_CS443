@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from IPython.display import display, clear_output
 import random 
 import math 
+import preprocessing
 
 
 class HopfieldNet():
@@ -40,7 +41,7 @@ class HopfieldNet():
         self.wts = self.initialize_wts(data)
         self.orig_height = orig_height
         self.orig_width = orig_width
-        self.energy_hist= []
+        self.energy_hist= [10, 20, 30]
         self.num_neurons= data.shape[1]
 
     def initialize_wts(self, data):
@@ -139,61 +140,71 @@ class HopfieldNet():
         if np.ndim(data) < 2:
             data = np.expand_dims(data, axis=0)
 
+        recalledImgs = data.copy()
+
         for i in range(self.num_samps):
             print("looping through samples")
             netAct = data[i].copy() #copy of data object
-            netAct = netAct.flatten().T
 
-            if len(self.energy_hist) < 2: # energy hist < 2
-                print("energy hist < 2")
+            # if len(self.energy_hist) < 2: # energy hist < 2
+            #     print("energy hist < 2")
+            #     #select random fraction of neurons
+            #     numCells = int(math.ceil(update_frac * self.num_samps)) #round indicies 
+
+            #     #get rand indices between 1 and numcells, without replacement 
+            #     print("num samps: ", self.num_samps)
+            #     print("numCells: ", numCells)
+            #     inds = np.random.randint(0, numCells)
+
+            #     #update net activity of this fraction
+
+            #     print("netAct: ", netAct.shape)
+            #     print("wts: ", self.wts.shape)
+            #     print("wts[:,inds]: ", self.wts[:,inds].shape)
+            #     flatAct= netAct.flatten()
+            #     print("flat:", flatAct.shape)
+            #     netAct[inds]= np.sign(np.sum(flatAct @ self.wts[:,inds])) #check dimensions #help
+
+            #     currEnergy = self.energy(netAct) #calculate energy 
+            #     self.energy_hist.append(currEnergy)
+
+            # else: 
+            while abs(self.energy_hist[-1] - self.energy_hist[-2]) > tol: #check energy tolerance level
+                print("checking energy levels")
                 #select random fraction of neurons
                 numCells = int(math.ceil(update_frac * self.num_samps)) #round indicies 
 
                 #get rand indices between 1 and numcells, without replacement 
-                print("num samps: ", self.num_samps)
-                print("numCells: ", numCells)
                 inds = np.random.randint(0, numCells)
 
-                #update net activity of this fraction
-
-                print("netAct: ", netAct.shape)
-                print("wts: ", self.wts.shape)
-                print("wts[:,inds]: ", self.wts[:,inds].shape)
+                #update net activity of this fraction 
                 flatAct= netAct.flatten()
-                print("flat:", flatAct.shape)
-                netAct[inds]= np.sign(np.sum(flatAct @ self.wts[:,inds])) #check dimensions #help
+                netAct[inds]= np.sign(np.sum(flatAct @ self.wts[:,inds])) #check dimensions
 
                 currEnergy = self.energy(netAct) #calculate energy 
+
+                ##re-create the net/train it on the images
+
                 self.energy_hist.append(currEnergy)
 
-            else: 
-                while self.energy_hist[-1] - self.energy_hist[-2] > tol: #check energy tolerance level
-                    print("checking energy levels")
-                    #select random fraction of neurons
-                    numCells = int(math.ceil(update_frac * self.num_samps)) #round indicies 
+            recalledImgs[i] = preprocessing.vec2img(data, np.sqrt(data.shape[0], np.sqrt(data.shape[0]))) 
 
-                    #get rand indices between 1 and numcells, without replacement 
-                    inds = np.random.randint(0, numCells)
-
-                    #update net activity of this fraction 
-                    flatAct= netAct.flatten()
-                    netAct[inds]= np.sign(np.sum(flatAct @ self.wts[:,inds])) #check dimensions
-
-                    currEnergy = self.energy(netAct) #calculate energy 
-                    self.energy_hist.append(currEnergy)
 
             if show_dynamics == True: #plotting code, use code from notebook 
 
                 fig = plt.figure()
                 ax = fig.add_subplot(1, 1, 1)
+                print("netAct", netAct.shape)
 
-                ax.plot(netAct)
-                ax.set_title("Energy")
+                ax.imshow(recalledImgs)
+                ax.set_title("Energy: " + str(self.energy_hist[-1]))
                 
                 display(fig)
                 clear_output(wait=True)
-                plt.pause(2)
+                plt.pause(5)
 
+
+        return recalledImgs
 
 
 

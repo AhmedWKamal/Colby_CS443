@@ -49,7 +49,7 @@ function [mnist_data, mnist_y] = load_mnist(mnist_path, which_set, num_exemplars
       full_mnist_y = full_mnist_y(full_mnist_y ~= i-1);
   end
   
-  
+  if do_plot
    for i = 1:min(10,num_exemplars)  
       for j = 1:num_classes      
            n1 = sub2ind([min(10,num_exemplars),num_classes],i,j);
@@ -59,6 +59,7 @@ function [mnist_data, mnist_y] = load_mnist(mnist_path, which_set, num_exemplars
            imshow(img_mat');
       end
    end
+  end
   
    mnist_data = im2double(mnist_data);
   

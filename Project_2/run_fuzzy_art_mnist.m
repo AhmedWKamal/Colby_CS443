@@ -46,12 +46,13 @@ function [mnist_test_y, code_inds, C] =  run_fuzzy_art_mnist(mnist_path, sets, .
   % - Predict the categories of the test set images.
   % - Possibly visualize the weights of the most active coding units during prediction to the test images.
   
+  %disp("Loading data...")
   [mnist_train_data, ~] = load_mnist(mnist_path, sets{1,1}, num_exemplars(1,1), num_classes, false);
   [mnist_test_data, mnist_test_y] = load_mnist(mnist_path, sets{2,1}, num_exemplars(2,1), num_classes, false);
-  
+  %disp("Training...")
   [C, w_code]= fuzzy_art_train(mnist_train_data, false, varargin{:});
-  
   if noisify_test
+      %disp("Adding noise to test data...")
       f = 0.84;
       num_corrupted_pixels = ceil(f*size(mnist_test_data,1));
       indices_to_corrupt = randperm(size(mnist_test_data,1),num_corrupted_pixels);
@@ -65,6 +66,7 @@ function [mnist_test_y, code_inds, C] =  run_fuzzy_art_mnist(mnist_path, sets, .
   end
   
   if erase_test
+      disp("Erasing part of test data...")
       f = 0.5;
       cols_erased = 1:ceil(f*28);
       for i = 1:size(mnist_test_data,2)
@@ -73,24 +75,29 @@ function [mnist_test_y, code_inds, C] =  run_fuzzy_art_mnist(mnist_path, sets, .
           mnist_test_data(:,i) = reshape(mat',784,1);
       end
   end
-  
+  %disp("Using net to predict...")
   code_inds = fuzzy_art_predict(C, w_code, mnist_test_data, false);
-  
   if plot_wts
+      %disp("Plotting weights...")
+      figure();
+      square_grid_size = ceil(sqrt(C));
       for i = 1:C
-          subplot(1,C,i);
+          subplot(square_grid_size,square_grid_size,i);
           img = uint8(w_code(1:784,i)*255);
           img_mat = reshape(img,28,28);
           imshow(img_mat');
       end
   end
-  
   if plot_recall
+      %disp("Plotting recall...")
+      figure();
       for i = 1:size(mnist_test_data,2)
+          %Show the test data
           subplot(size(mnist_test_data,2),2,2*i-1);
           img = mnist_test_data(:,i);
           img_mat = reshape(img,28,28);
           imshow(img_mat');
+          %Show the recalled memory
           subplot(size(mnist_test_data,2),2,2*i);
           img = uint8(w_code(1:784,code_inds(i))*255);
           img_mat = reshape(img,28,28);

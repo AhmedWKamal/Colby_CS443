@@ -174,13 +174,14 @@ class HopfieldNet():
                 fig = plt.figure()
                 ax = fig.add_subplot(1, 1, 1)
 
+            self.energy_hist= [10,20] #reset from running prev sample 
             while abs(self.energy_hist[-1] - self.energy_hist[-2]) > tol: #check energy tolerance level
                 #print("checking energy levels")
                 #select random fraction of neurons
                 numCells = int(math.ceil(update_frac * self.num_samps)) #round indicies 
 
                 #get rand indices between 1 and numcells, without replacement 
-                inds = np.random.randint(0, numCells)
+                inds = np.random.randint(0, self.num_samps, numCells)
 
                 #update net activity of this fraction 
                 flatAct= netAct.flatten()

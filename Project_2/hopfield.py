@@ -41,7 +41,7 @@ class HopfieldNet():
         self.wts = self.initialize_wts(data)
         self.orig_height = orig_height
         self.orig_width = orig_width
-        self.energy_hist= [10, 20]
+        self.energy_hist= []
         self.num_neurons= data.shape[1]
 
     def initialize_wts(self, data):
@@ -62,11 +62,6 @@ class HopfieldNet():
 
         NOTE: It might be helpful to average the weights over samples to avoid large weights.
         '''
-        # for i in range(len(data)):
-        #     wts = sum()
-
-
-        #old wts (np.sum(data.T @ data)) / (self.num_samps)
         self.wts = ((data.T @ data)) / (self.num_samps)
         np.fill_diagonal(self.wts, 0)
         return self.wts
@@ -85,12 +80,7 @@ class HopfieldNet():
         -----------
         float. The energy.
         '''
-        netAct = netAct[np.newaxis, :]
-        # print(np.shape(netAct))
-        # print(np.shape(self.wts))
-        #en = (-.5)*(np.sum(np.sum(netAct.T @ self.wts @ netAct)))
-        en = (-.5)*(np.sum(np.sum(netAct @ self.wts @ netAct.T)))
-        return en 
+        return (-.5)*(np.sum(np.sum(netAct @ self.wts @ netAct.T)))
 
     def predict(self, data, update_frac=0.1, tol=1e-15, verbose=False, show_dynamics=False):
         '''Use each data sample in `data` to look up the associated memory stored in the network.
@@ -136,93 +126,170 @@ class HopfieldNet():
 
         NOTE: Your code should work even if num_test_samps=1.
         '''
-        #print("running")
+        # if np.ndim(data) < 2:
+        #     data = np.expand_dims(data, axis=0)
+        # if show_dynamics:
+        #     fig = plt.figure()
+        #     ax = fig.add_subplot(1, 1, 1)
+        # N, M = data.shape
+        # #at t=0, initialize all netAct to test sample
+        # netAct = np.copy(data)
+
+        # for i in range(N):
+        #     # print(i)
+        #     prev_e = 100
+        #     curr_e = 0
+        #     time_step = 0
+
+        #     while prev_e - curr_e > tol:
+        #         # time_step = time_step + 1
+        #         # print(time_step)
+                
+        #         #previous energy
+        #         prev_e = self.energy(netAct[i,:])
+        #         #pick proportion of neurons to update 
+        #         ind = np.random.choice(M, int(update_frac * M))
+        #         netAct[i, ind] = np.sign(netAct[i,:] @ self.wts[:,ind])
+        #         curr_e = self.energy(netAct[i,:])
+
+        #         #plot current netAct
+        #         if show_dynamics:
+        #             ax.imshow(np.reshape(netAct[i,:],(self.orig_width, self.orig_height)),cmap="bone")
+        #             ax.set_title(str(curr_e))
+
+        #             display(fig)
+        #             clear_output(wait=True)
+        #             plt.pause(0.5)
+
+        # return netAct
+
+
+
+
         if np.ndim(data) < 2:
             data = np.expand_dims(data, axis=0)
 
-        recalledImgs = data.copy()
-
-        for i in range(self.num_samps):
-            #print("looping through samples")
-            netAct = data[i].copy() #copy of data object
-
-            # if len(self.energy_hist) < 2: # energy hist < 2
-            #     print("energy hist < 2")
-            #     #select random fraction of neurons
-            #     numCells = int(math.ceil(update_frac * self.num_samps)) #round indicies 
-
-            #     #get rand indices between 1 and numcells, without replacement 
-            #     print("num samps: ", self.num_samps)
-            #     print("numCells: ", numCells)
-            #     inds = np.random.randint(0, numCells)
-
-            #     #update net activity of this fraction
-
-            #     print("netAct: ", netAct.shape)
-            #     print("wts: ", self.wts.shape)
-            #     print("wts[:,inds]: ", self.wts[:,inds].shape)
-            #     flatAct= netAct.flatten()
-            #     print("flat:", flatAct.shape)
-            #     netAct[inds]= np.sign(np.sum(flatAct @ self.wts[:,inds])) #check dimensions #help
-
-            #     currEnergy = self.energy(netAct) #calculate energy 
-            #     self.energy_hist.append(currEnergy)
-
-            # else: 
-            if show_dynamics == True: #plotting code, use code from notebook 
-
+        if show_dynamics == True:
                 fig = plt.figure()
                 ax = fig.add_subplot(1, 1, 1)
 
-            self.energy_hist= [10,20] #reset from running prev sample 
-            while abs(self.energy_hist[-1] - self.energy_hist[-2]) > tol: #check energy tolerance level
-                #print("checking energy levels")
-                #select random fraction of neurons
-                numCells = int(math.ceil(update_frac * self.num_samps)) #round indicies 
+        recalledImgs = np.zeros_like(data)
 
-                #get rand indices between 1 and numcells, without replacement 
-                inds = np.random.randint(0, self.num_samps, numCells)
+        for i in range(data.shape[0]):
 
-                #update net activity of this fraction 
-                flatAct= netAct.flatten()
-                netAct[inds]= np.sign(np.sum(flatAct @ self.wts[:,inds])) #check dimensions
+            netAct = data[i,:].copy()
+            self.energy_hist= []
 
-                currEnergy = self.energy(netAct) #calculate energy 
+            self.energy_hist.append(self.energy(netAct))
 
-                ##re-create the net/train it on the images
+            #We use lazy evaluation to deal with a list of length less than 3
+            while (len(self.energy_hist)==1) or (self.energy_hist[-2] - self.energy_hist[-1] > tol):
 
-                self.energy_hist.append(currEnergy)
+                numCells = math.ceil(update_frac * self.num_neurons)
+                inds = np.random.choice(self.num_neurons, numCells)
 
-                if show_dynamics == True: #plotting code, use code from notebook 
+                netAct[inds]= np.sign(netAct @ self.wts[:,inds])
 
-                    ax.imshow(netAct.reshape(64,64), cmap='bone') #edit to 128
-                    ax.set_title("Energy: " + str(self.energy_hist[-1]))
+                self.energy_hist.append(self.energy(netAct))
+
+                if show_dynamics == True:
+
+                    ax.imshow(netAct.reshape(64,64), cmap='bone')
+                    ax.set_title("Energy: " + str(self.energy_hist[-1]), fontsize=12)
                     
                     display(fig)
                     clear_output(wait=True)
                     plt.pause(.1)
 
-
-            #print("recalledImgs[i]", type(recalledImgs))
-
-            recalledImgs[i] =  netAct #np.asarray(preprocessing.vec2img(data, np.sqrt(data.shape[0], np.sqrt(data.shape[0]))) )
-
-            #print("recalledImgs[i]", type(recalledImgs))
-
-            
-
-
+            recalledImgs[i] =  netAct
 
         return recalledImgs
 
 
 
-# img_filename = os.path.join('data', 'mountain_1x.png') 
-# img = plt.imread(img_filename)
-# print(f'Image size is {img.shape}')
-# plt.imshow(img)
-# plt.xticks([]) plt.yticks([]) plt.show()
 
+
+
+
+
+        # print("running")
+        # if np.ndim(data) < 2:
+        #     data = np.expand_dims(data, axis=0)
+
+        # recalledImgs = data.copy()
+
+        # for i in range(self.num_samps):
+        #     #print("looping through samples")
+        #     netAct = data[i].copy() #copy of data object
+
+        #     # if len(self.energy_hist) < 2: # energy hist < 2
+        #     #     print("energy hist < 2")
+        #     #     #select random fraction of neurons
+        #     #     numCells = int(math.ceil(update_frac * self.num_samps)) #round indicies 
+
+        #     #     #get rand indices between 1 and numcells, without replacement 
+        #     #     print("num samps: ", self.num_samps)
+        #     #     print("numCells: ", numCells)
+        #     #     inds = np.random.randint(0, numCells)
+
+        #     #     #update net activity of this fraction
+
+        #     #     print("netAct: ", netAct.shape)
+        #     #     print("wts: ", self.wts.shape)
+        #     #     print("wts[:,inds]: ", self.wts[:,inds].shape)
+        #     #     flatAct= netAct.flatten()
+        #     #     print("flat:", flatAct.shape)
+        #     #     netAct[inds]= np.sign(np.sum(flatAct @ self.wts[:,inds])) #check dimensions #help
+
+        #     #     currEnergy = self.energy(netAct) #calculate energy 
+        #     #     self.energy_hist.append(currEnergy)
+
+        #     # else: 
+        #     if show_dynamics == True: #plotting code, use code from notebook 
+
+        #         fig = plt.figure()
+        #         ax = fig.add_subplot(1, 1, 1)
+
+        #     self.energy_hist= [10,20] #reset from running prev sample 
+        #     while abs(self.energy_hist[-1] - self.energy_hist[-2]) > tol: #check energy tolerance level
+        #         #print("checking energy levels")
+        #         #select random fraction of neurons
+        #         numCells = int(math.ceil(update_frac * self.num_samps)) #round indicies 
+
+        #         #get rand indices between 1 and numcells, without replacement 
+        #         inds = np.random.randint(0, self.num_samps, numCells)
+
+        #         #update net activity of this fraction 
+        #         flatAct= netAct.flatten()
+        #         netAct[inds]= np.sign(np.sum(flatAct @ self.wts[:,inds])) #check dimensions
+
+        #         currEnergy = self.energy(netAct) #calculate energy 
+
+        #         ##re-create the net/train it on the images
+
+        #         self.energy_hist.append(currEnergy)
+
+        #         if show_dynamics == True: #plotting code, use code from notebook 
+
+        #             ax.imshow(netAct.reshape(64,64), cmap='bone') #edit to 128
+        #             ax.set_title("Energy: " + str(self.energy_hist[-1]))
+                    
+        #             display(fig)
+        #             clear_output(wait=True)
+        #             plt.pause(.1)
+
+
+        #     #print("recalledImgs[i]", type(recalledImgs))
+
+        #     recalledImgs[i] =  netAct #np.asarray(preprocessing.vec2img(data, np.sqrt(data.shape[0], np.sqrt(data.shape[0]))) )
+
+        #     #print("recalledImgs[i]", type(recalledImgs))
+
+            
+
+
+
+        # return recalledImgs
 
 
 

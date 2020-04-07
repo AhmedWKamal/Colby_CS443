@@ -28,11 +28,9 @@ def resize_imgs(imgs, width, height):
     '''
     imgs = imgs.copy()
     for i in range(len(imgs)):
-        imgs[i]= imgs[i].resize((width, height))
+        imgs[i] = imgs[i].resize((width, height))
         imgs[i] = ImageOps.grayscale(imgs[i])
         imgs[i] = np.array(imgs[i])
-    #imgs= np.uint8s(imgs)
-    #imgs = imgs.astype(np.uint8)
     return np.array(imgs)
 
 
@@ -54,36 +52,25 @@ def img2binaryvectors(data, bipolar=True):
     - Center the image then threshold at 0 so that values are either -1 or +1.
     - Reshape so that the result is a 1D vector (see shape above)
     '''
-    # #normalize
-    # maxData= np.max(data, axis=0 )
-    # minData = np.min(data, axis=0)
-    normData= data.copy()
-    # normData= (data - minData)/maxData 
-    # normData= normData- np.mean(normData, axis = 0 )
-    # #center 
-    # plt.imshow(normData[0].reshape(64,64))
 
-    #do in loop 
+    polar_binary_imgs = np.zeros(np.shape(data)).astype(int)
 
-    for i in range(len(data)):
-        curr_data = normData[i]
-        maxData= np.max(curr_data)
+    for i in range(np.shape(data)[0]):
+        
+        curr_data = data[i,:,:]
+        maxData = np.max(curr_data)
         minData = np.min(curr_data)
         curr_data = (curr_data - minData)/(maxData - minData)
-
-        curr_data= curr_data- np.mean(curr_data )
+        curr_data = curr_data - np.mean(curr_data )
 
         curr_data[curr_data >= 0] = 1
-        # normData[i] = curr_data
         curr_data[curr_data < 0] = -1
-        normData[i] = curr_data
-    #reshape
-    print("normData", normData.shape)
-    print("normData0 ", normData.shape[0])
-    print("normData1 ", normData.shape[1:])
-    imgvect = np.reshape(normData , (normData.shape[0], np.prod(normData.shape[1:])))
 
-    return imgvect
+        polar_binary_imgs[i,:,:] = curr_data
+
+    polar_binary_imgs = np.reshape(polar_binary_imgs , (data.shape[0], np.prod(data.shape[1:])))
+
+    return polar_binary_imgs
 
 
 
@@ -102,10 +89,11 @@ def vec2img(feat_vecs, width, height):
     ndarray. shape=(N, height, width).
         Inflated version of `feat_vecs` into images
     '''
-    #divide last col by width? 
-    #reshape to width by height 
-    image = np.reshape(feat_vecs, (feat_vecs.shape[0], width, height))
-    return image 
+    N = feat_vecs.shape[0]
+    imgs = np.zeros((feat_vecs.shape[0],height,width))
+    for i in range(N):
+        imgs[i,:,:] = feat_vecs[i,:].reshape(height,width)
+    return imgs
 
 
 def recall_error(orig_data, recovered_data, tol=0.5):

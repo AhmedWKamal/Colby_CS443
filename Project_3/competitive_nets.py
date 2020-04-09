@@ -31,7 +31,28 @@ def leaky_integrator(I, A, B, t_max, dt):
     ndarray. shape=(n_steps, N).
         Each unit in the network's activation at all the integration time steps.
     '''
-    pass
+    currActs=[]
+
+    while dt < t_max:
+        x_i= []
+        for i in range(I.shape[0]):
+
+            x_i[dt] = x_i[dt-1] + dt*fx
+            #print("I:", I )
+            test = I[i]*(B-x_i[dt])
+            #print("test:", test )
+
+            fx = [x + (A*x_i[dt]) for x in test]
+
+            x_i.append(fx)
+            #print("netAct:", netAct )
+
+        currActs.append(x_i)
+
+    netActs = np.array(currActs)
+
+    return netActs
+
 
 
 def sum_not_I(I):
@@ -46,7 +67,12 @@ def sum_not_I(I):
     -----------
     ndarray. shape=shape(I).
     '''
-    pass
+    arr = np.zeros(size(I))
+    total_sum = np.sum(I)
+    for i range(np.prod(A.shape))
+        arr[i] = total_sum - I[i]
+
+    return arr 
 
 
 def lateral_inhibition(I, A, B, t_max, dt):
